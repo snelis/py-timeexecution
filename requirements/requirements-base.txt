@@ -1,0 +1,1 @@
+git+ssh://git@stash.kpnnl.local:7999/de/py-pkgversion.git@1.0.0#egg=py-pkgversion
