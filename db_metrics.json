@@ -1,0 +1,26 @@
+{
+    "continuousQueries": [
+        "select count(call) as sum,mean(duration),max(duration),min(duration) from /^de_(service|api)$/ where call !~ /\\d+$/ group by time(5s),env,call,code into cq.5s.[env].[call].[code]",
+        "select count(call) as sum,mean(duration),max(duration),min(duration) from /^de_(service|api)$/ where call !~ /\\d+$/ group by time(20s),env,call,code into cq.20s.[env].[call].[code]",
+        "select count(call) as sum,mean(duration),max(duration),min(duration) from /^de_(service|api)$/ where call !~ /\\d+$/ group by time(5m),env,call,code into cq.5min.[env].[call].[code]",
+        "select count(call) as sum,mean(duration),max(duration),min(duration) from /^de_api$/ where app_name <> '' and call !~ /\\\\d+$/ group by time(5s),env,app_name,call,code into cq.5s.o.[app_name].[env].[call].[code]"
+    ],
+    "spaces": [
+        {
+            "name": "default",
+            "regex": "/.*/",
+            "replicationFactor": 1,
+            "retentionPolicy": "1d",
+            "shardDuration": "1h",
+            "split": 1
+        },
+        {
+            "name": "5s",
+            "regex": "/^cq\\.\\d+.*/",
+            "replicationFactor": 1,
+            "retentionPolicy": "7d",
+            "shardDuration": "1d",
+            "split": 1
+        }
+    ]
+}
