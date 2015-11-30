@@ -1,3 +1,5 @@
+DE_PYPI_HOST=`docker-machine ip default`
+DE_PYPI="http://${DE_PYPI_HOST}:8333/simple/"
 VENVBIN= "venv/bin"
 VENVACTIVATE = "${VENVBIN}/activate"
 PYTHON=`. ${VENVACTIVATE}; which python`
@@ -18,7 +20,8 @@ clean: docsclean
 virtualenv: clean
 	test -d venv || virtualenv-2.7 -p python2.7 venv
 	$(PIP) install -U "pip>=7.0"
-	$(PIP) install -r requirements.txt -q
+	$(PIP) install -i $(DE_PYPI) --trusted-host $(DE_PYPI_HOST) py-pkgversion -q
+	$(PIP) install -i $(DE_PYPI) --trusted-host $(DE_PYPI_HOST) -r requirements.txt -q
 
 build: clean
 	$(TOX)
@@ -40,3 +43,6 @@ docker:
 
 docker/%:
 	docker-compose run --rm app make $*
+
+publish:
+	$(PYTHON) setup.py sdist upload -r time_execution
