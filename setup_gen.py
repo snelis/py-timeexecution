@@ -1,15 +1,20 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+from pkgversion import list_requirements, pep440_version
 
+template = """
 from setuptools import find_packages, setup
 
 setup(
     name='py-timeexecution',
-    version='0.0.2',
+    version='{version}',
     description="Python project",
     long_description=open('README.md').read(),
     author="",
     author_email='',
     url='https://stash.kpnnl.local/DE/py-timeexecution',
-    install_requires=['py-pkgversion', 'django'],
+    install_requires={install_requires},
     packages=find_packages(exclude=['timeexecution.tests*']),
     tests_require=['tox'],
     include_package_data=True,
@@ -25,3 +30,12 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
     ]
 )
+"""
+
+setup_py = os.path.join(os.path.dirname(__file__), 'setup.py')
+
+with open(setup_py, 'w+') as f:
+    f.write(template.format(
+        version=pep440_version(),
+        install_requires=list_requirements('requirements/requirements-base.txt')
+    ))
