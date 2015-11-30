@@ -45,4 +45,5 @@ docker/%:
 	docker-compose run --rm app make $*
 
 publish:
+	$(PYTHON) setup_gen.py
 	$(PYTHON) setup.py sdist upload -r de

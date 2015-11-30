@@ -3,13 +3,13 @@ from setuptools import find_packages, setup
 
 setup(
     name='py-timeexecution',
-    version='0.0.2',
+    version='0.0.3',
     description="Python project",
     long_description=open('README.md').read(),
     author="",
     author_email='',
     url='https://stash.kpnnl.local/DE/py-timeexecution',
-    install_requires=['py-pkgversion', 'django'],
+    install_requires=[],
     packages=find_packages(exclude=['timeexecution.tests*']),
     tests_require=['tox'],
     include_package_data=True,

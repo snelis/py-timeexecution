@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-from pkgversion import list_requirements, pep440_version
+from pkgversion import list_requirements, pep440_version, write_setup_py
 
 template = """
 from setuptools import find_packages, setup
@@ -32,10 +32,8 @@ setup(
 )
 """
 
-setup_py = os.path.join(os.path.dirname(__file__), 'setup.py')
-
-with open(setup_py, 'w+') as f:
-    f.write(template.format(
-        version=pep440_version(),
-        install_requires=list_requirements('requirements/requirements-base.txt')
-    ))
+write_setup_py(
+    template,
+    version=pep440_version(),
+    install_requires=list_requirements('requirements/requirements-base.txt')
+)
