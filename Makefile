@@ -45,4 +45,4 @@ docker/%:
 	docker-compose run --rm app make $*
 
 publish:
-	$(PYTHON) setup.py sdist upload -r time_execution
+	$(PYTHON) setup.py sdist upload -r de
