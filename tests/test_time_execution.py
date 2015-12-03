@@ -1,19 +1,69 @@
 import unittest
-from time_execution import time_execution
+
+import os
+from influxdb.influxdb08.client import InfluxDBClientError
+from time_execution import time_execution, configure
+from time_execution.backends.influxdb import InfluxBackend
 
 
-class TestRaiseForMaintenance(unittest.TestCase):
-    def test_time_execution_call_executes_normally(self):
-        class Mock:
-            def __init__(self):
-                self.func_has_been_called = False
+@time_execution
+def fqn_test():
+    pass
 
-            @time_execution('Mock')
-            def func(self):
-                self.func_has_been_called = True
 
-        mock = Mock()
-        mock.func()
+@time_execution
+class Dummy(object):
+    @time_execution
+    def go(self):
+        pass
 
-        self.assertEqual('tests.test_time_execution.Mock.func', Mock.func.__fqn__)
-        self.assertTrue(mock.func_has_been_called)
+
+class TestTimeExecution(unittest.TestCase):
+    def setUp(self):
+        super(TestTimeExecution, self).setUp()
+
+        self.database = 'unittest'
+        self.backend = InfluxBackend(
+            host=os.environ.get('INFLUX_PORT_4444_UDP_ADDR', 'localhost'),
+            database=self.database,
+            use_udp=False
+        )
+
+        try:
+            self.backend.client.create_database(self.database)
+        except InfluxDBClientError:
+            # Something blew up so ignore it
+            pass
+
+        configure(backends=[self.backend])
+
+    def tearDown(self):
+        self.backend.client.delete_database(self.database)
+
+    def test_fqn(self):
+        self.assertEqual(fqn_test.fqn, 'tests.test_time_execution.fqn_test')
+        self.assertEqual(Dummy.fqn, 'tests.test_time_execution.Dummy')
+        self.assertEqual(Dummy().go.fqn, 'tests.test_time_execution.Dummy.go')
+
+    def test_time_execution(self):
+
+        count = 4
+
+        @time_execution
+        def go():
+            return True
+
+        for i in range(count):
+            go()
+
+        query = 'select * from {}'.format(go.fqn)
+        metrics = self.backend.client.query(query)
+        self.assertEqual(len(metrics[0]['points']), count)
+
+    def test_time_execution_hook(self):
+
+        @time_execution
+        def go():
+            return True
+
+        go()

@@ -1,4 +1,4 @@
-FROM snelis/tox:latest
+FROM kpndigital/tox:latest
 
 RUN git config --global url."https://".insteadOf git://
 RUN git config --global url."https://stash.kpnnl.local/scm".insteadOf ssh://git@stash.kpnnl.local:7999
